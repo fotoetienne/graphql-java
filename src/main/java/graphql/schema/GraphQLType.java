@@ -10,4 +10,7 @@ import graphql.PublicApi;
  */
 @PublicApi
 public interface GraphQLType extends GraphQLSchemaElement {
+
+    @Deprecated
+    String getName();
 }

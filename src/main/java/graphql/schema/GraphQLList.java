@@ -102,4 +102,8 @@ public class GraphQLList implements GraphQLType, GraphQLInputType, GraphQLOutput
         return GraphQLTypeUtil.simplePrint(this);
     }
 
+    @Override
+    public String getName() {
+        return "List";
+    }
 }
