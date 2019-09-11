@@ -98,9 +98,11 @@ public class SchemaGenerator {
      */
     public static class Options {
         private final boolean enforceSchemaDirectives;
+        private final boolean throwOnError;
 
-        Options(boolean enforceSchemaDirectives) {
+        Options(boolean enforceSchemaDirectives, boolean throwOnError) {
             this.enforceSchemaDirectives = enforceSchemaDirectives;
+            this.throwOnError = throwOnError;
         }
 
         /**
@@ -113,8 +115,12 @@ public class SchemaGenerator {
             return enforceSchemaDirectives;
         }
 
+        public boolean isThrowOnError() {
+            return throwOnError;
+        }
+
         public static Options defaultOptions() {
-            return new Options(true);
+            return new Options(true, true);
         }
 
         /**
@@ -126,9 +132,19 @@ public class SchemaGenerator {
          * @return the new options
          */
         public Options enforceSchemaDirectives(boolean flag) {
-            return new Options(flag);
+            return new Options(flag, throwOnError);
         }
 
+        /**
+         * This controls whether a SchemaProblem exception is thrown when there are schema errors
+         *
+         * @param flag the value to use
+         *
+         * @return the new options
+         */
+        public Options throwOnError(boolean flag) {
+            return new Options(enforceSchemaDirectives, flag);
+        }
     }
 
 
@@ -266,7 +282,7 @@ public class SchemaGenerator {
         schemaGeneratorHelper.addDeprecatedDirectiveDefinition(typeRegistryCopy);
 
         List<GraphQLError> errors = typeChecker.checkTypeRegistry(typeRegistryCopy, wiring, options.enforceSchemaDirectives);
-        if (!errors.isEmpty()) {
+        if (!errors.isEmpty() && options.isThrowOnError()) {
             throw new SchemaProblem(errors);
         }
         BuildContext buildCtx = new BuildContext(typeRegistryCopy, wiring);
